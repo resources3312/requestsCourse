@@ -1,1 +1,1 @@
-# requestsCourse
+# Практическое пособие по библиотеке requests
