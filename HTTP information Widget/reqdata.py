@@ -24,7 +24,8 @@ class ApplicationGUI(QMainWindow):
                                    }
 
         self.widget = QWidget()
-
+        self.widget.setStyleSheet("QLabel {color: #111111; font-weight: bold;} QPushButton {color: #111111; font-weight: bold;}")
+        
         self.informationForm = QFormLayout()
         self.informationForm.setHorizontalSpacing(145)
         self.informationForm.setVerticalSpacing(25) 
