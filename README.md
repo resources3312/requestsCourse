@@ -164,7 +164,6 @@ Connection: close
 import requests # Импортируем библиотеку requests
 
 res = requests.get("https://httpbin.org/get") # Делаем GET запрос по указанному URL
-
 print(res.url) # Отображаем URL на который был сделан запрос
 print(res.text) # Отображаем ответ на запрос в текстовом виде
 print(res.json()) # Отображаем ответ в формате декодированного JSON
@@ -177,7 +176,6 @@ import requests # Импортируем библиотеку requests
 payload = {"key": "value"} # Данные для отправки в GET запросе
 
 res = requests.get("https://httpbin.org/get", params=payload) # Делаем GET запрос к httpbin.org
-
 print(f"Host: {res.url}") # Отображаем URL с переданными данными
 print(f"Raw: {res.text}") # Отображаем тело ответа в текстовом формате
 print(f"Json: {res.json()}") # Отображаем тело ответа в формате словаря
@@ -193,7 +191,6 @@ import requests # Импортируем библиотеку requests
 payload = {"name": "Ivan", "age": 40} # Данные формы для отправки в теле POST запроса
 
 res = requests.post("https://httpbin.org/post", data=payload) # Делаем POST запрос на https:/httpbin.org/post
-
 print(f"Raw: {res.text}") # Отображаем тело ответа в текстовом формате
 print(f"Json: {res.json()}") # Отображаем тело ответа в формате словаря
 ```
@@ -205,7 +202,6 @@ import requests # Импортируем библиотеку requests
 payload = {"name": "Ivan", "age": 40} # Данные формы для отправки в теле POST запроса
 
 res = requests.post("https://httpbin.org/post", json=payload) # Делаем POST запрос на https:/httpbin.org/post
-
 print(f"Result: {res.text}") # Отображаем тело ответа в текстовом формате
 print(f"Json: {res.json()}") # Отображаем тело ответа в формате словаря
 ```
@@ -257,6 +253,8 @@ print(res.text) # Отображаем тело ответа в текстово
 Данный метод служит для обновления указанного в **URL** ресурса на удаленном сервере, однако в отличии от метода **PUT**, который также служит для обновления данных, метод **PATCH** выполняет идентичную функцию, при этом заменяя не весь ресурс, а лишь отдельные его атрибуты 
 **Отправка PATCH запроса с полезной нагрузкой**
 ```python
+import requests # Импортируем библиотеку requests
+
 payload = {"name": "Victor"} # Данные для отправки в теле PATCH запроса
 res = requests.patch("https://httpbin.org/patch", data=payload) # Делаем запрос к https://httpbin.org/patch с полезной нагрузкой внутри тела запроса
 
@@ -265,7 +263,10 @@ print(res.text) # Отображаем тело ответа в текстово
 
 **Отправка PATCH запроса с полезной нагрузкой в формате JSON**
 ```python
+import requests # Импортируем библиотеку requests
+
 payload = {"age": 35} # Данные для отправки в теле PATCH запроса
+
 res = requests.patch("https://httpbin.org/patch", json=payload) # Делаем запрос к https://httpbin.org/patch с полезной нагрузкой в формате JSON.
 print(res.text) # Отображаем тело ответа в текстовом формате
 ```
@@ -275,6 +276,8 @@ print(res.text) # Отображаем тело ответа в текстово
 
 **Отправка HEAD запроса для получение заголовка ответа**
 ```python
+import requests # Импортируем библиотеку requests
+
 res = requests.head("https://httpbin.org/")
 print(f"Headers: {res.headers}")
 ```
@@ -283,6 +286,8 @@ print(f"Headers: {res.headers}")
 
 **Отправка OPTIONS запроса для получения списка доступных методов**
 ```python
+import requests # Импортируем библиотеку requests
+
 res = requests.options("https://httpbin.org/")
 print(f"Allow methods: {res.headers['Allow'}")
 ```
@@ -300,9 +305,12 @@ print(f"Allow methods: {res.headers['Allow'}")
 ```python
 import requests
 from requests.exceptions import RequestException
+
 try:
     res = requests.get("https://httpbin.org/djsjwk23i3fkd8", timeout=0.0000001)
+
 except RequestException as e: print(f"Произошла ошибка: {e}")
+
 ```
 ### **ConnectionError**
 Данное исключение вызывается при наличии проблем с подключением к удаленному серверу. Наиболее распрастраненными причинами вызова данного исключения можно считать разрыв **TCP** соединения, отсутствие подключения к сети, или остановку работы запрашиваемого сервера
@@ -311,9 +319,12 @@ except RequestException as e: print(f"Произошла ошибка: {e}")
 ```python
 import requests
 from requests.exceptions import ConnectionError
+
 try:
     res = requests.get("https://httpbin.org/get")
+
 except ConnectionError as e: print(f"Ошибка подключения к серверу: {e}")
+
 ```
 ### **HTTPError**
 Данное исключение вызывается в случае если ответ сервера содержит коды состояния **4xx**, **5xxx** т.е на стороне клиента(**4xx**) или на стороне сервера (**5xx**) присутствует ошибка
@@ -322,9 +333,13 @@ except ConnectionError as e: print(f"Ошибка подключения к се
 ```python
 import requests
 from requests.exceptions import HTTPError
+
 try:
     res = requests.get("https://httpbin.org/fnej3sneksmk")
+    res.raise_for_status()
+
 except HTTPError as e: print(f"Ошибка HTTP запроса: {e}")
+
 ```
 
 ### **Timeout**
@@ -334,7 +349,10 @@ except HTTPError as e: print(f"Ошибка HTTP запроса: {e}")
 ```python
 import requests
 from requests.exceptions import Timeout
+
 try:
     res = requests.get("https://httpbin.org/get", timeout=0.00003)
+
 except Timeout as e: print(f"Превышен установленный интервал ожидания ответа: {e}")
+
 ```
