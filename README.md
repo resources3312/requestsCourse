@@ -369,6 +369,7 @@ except Timeout as e: print(f"Превышен установленный инт�
 import requests # Импортируем библиотеку requests
 
 data = {"name": "Ivan", "age": 40} # Данные для отправки в теле POST запроса
+
 headers = {
 "Content-Type": "application/json",
 "User-Agent": "custom-useragent/1.0"
