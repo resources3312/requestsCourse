@@ -12,7 +12,8 @@
 8. [Использование cookie](#использование-сookie)
 9. [Timeout HTTP запроса](#timeout-http-запроса)
 10. [Использование HTTP proxy](#использование-http-proxy)
-11. [Управление перенаправлениями (Redirect)](#управление-redirect) 
+11. [Управление перенаправлениями (Redirect)](#управление-redirect)
+12. [Передача файлов](#передача-файлов)
 ## Что такое протокол HTTP
 
 **HTTP (Hyper Text Transfer Protocol)** – или протокол передачи гипертекста. Представляет собой протокол прикладного уровня модели **OSI**, предназначен для передачи данных в формате гипертекста между клиентом (браузером) и сервером, что хранит набор гипертекстовых документов
@@ -456,7 +457,7 @@ print(res.status_code) # Отображаем код состояния (301, 30
 **Установка ограничения на количество перенаправлений**
 ```python
 import requests # Импортируем библиотеку requests
-from requests.exceptions import TooManyRedirects
+from requests.exceptions import TooManyRedirects # Импортируем исключение TooManyRedirects
 try:
   res = requests.get("https://httpbin.org/get", max_redirects=10) # Делаем GET запрос с органичением по количеству перенаправлений 
   print(res.status_code) # Отображаем код состояния (301, 302)
@@ -475,4 +476,49 @@ res = requests.get("https://httpbin.org/get", allow_redirect=False) # Делае
 print("История перенаправлений:") 
 for url in res.history: print(url)
 
+```
+
+## Передача файлов
+
+Одной из распространенных задач при работе с библиотекой **requests** можно назвать проведение операций над файлами различных форматов. 
+Существует основных два типа операций с файлами в рамках протокола **HTTP**:
+ 
+ - **Upload** — отправка файла на удаленный сервер, ввиде последовательности байт
+      
+ - **Download** — или отправка запроса к удаленному серверу на получение массива байт, и его дальнейшей записи в пустой файл
+
+В случае если файл имеет небольшой размер, допустима передача его содержимого одним фрагментом, однако в большинстве случаев корректней
+осуществлять передачу файла по частям, которые принято называть [чанками](https://ru.wikipedia.org/wiki/Chunked_transfer_encoding). 
+
+Ниже приведены примеры скачивания (**Download**) и загрузки (**Upload**) содержимого файлов по фрагментам, с помощью базовых методов библиотеки **requests**
+
+**Скачивание файла с удаленного сервера (Download)**
+```python
+import requests # Импортируем библиотеку requests
+from requests.exceptions import RequestException # Импортируем исключение RequestException
+
+try:
+    res = requests.get("https://httpbin.org/image/png", stream=True) # Делаем GET запрос для получения файла с удаленного сервера ввиде последовательности байт
+    res.raise_for_status()
+
+    if res.status_code == 200: 
+        with open("image.png", "wb") as file: # Открываем файл image.png на запись байтов без кодировки
+            for chunk in res.iter_content(chunk_size=2048): file.write(chunk) # Записываем изображение в файл image.png по 2048 байт за итерацию
+            print("Скачивание завершено") # Отображаем уведомление об успешном завершении операции 
+
+except requests.exceptions.RequestError as e: print(f"Произошла ошибка при скачивании файла: {e}")
+```
+
+**Загрузка файла на удаленный сервер (Upload)**
+```python
+import requests # Импортируем библиотеку requests
+from requests.exceptions import RequestException # Импортируем исключение
+
+file = {"file": open("filename.ext", "rb")} # Содержимое файла ввиде последовательности байт внутри словаря
+
+try:
+  res = requests.post("https://httpbin.org/post", files=file) # Делаем POST запрос к https://httpbin.org/post загружая на сервер файл ввиде последовательности байт
+  print(f"[{res.status_code}] Файл был загружен по адресу {res.url}") # Отображаем уведомление об успешной загрузке файла на сервер 
+
+except RequestException as e: print(f"Произошла ошибка при загрузке файла: {e}")
 ```
