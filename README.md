@@ -15,6 +15,7 @@
 11. [Управление перенаправлениями (Redirect)](#управление-redirect)
 12. [Передача файлов](#передача-файлов)
 13. [Аутентификация](#аутентификация)
+14. [HTTP cессии (Session)](#http-сессии)
 ## Что такое протокол HTTP
 
 **HTTP (Hyper Text Transfer Protocol)** – или протокол передачи гипертекста. Представляет собой протокол прикладного уровня модели **OSI**, предназначен для передачи данных в формате гипертекста между клиентом (браузером) и сервером, что хранит набор гипертекстовых документов
@@ -573,4 +574,43 @@ class HTTPTokenAuth(AuthBase):
 res = requests.get("https://httpbin.org/bearer", auth=HTTPTokenAuth("token")) # Делаем GET запрос к указанному URL с использованием кастомной реализации аутентификации
 print("Аутентификация с использованием токена успешно завершена" if res.status_code == 200 else "Ошибка аутентификации через токен")
 
+```
+
+## HTTP сессии
+Зачастую при работе с протоколом **HTTP** возникает необходимость отправки большого числа запросов в рамках короткого временного интервала, однако все может стать сложнее, если запросы имеют сложную конфигурацию, например, пользовательские заголовки, или передаются через прокси сервер. Для решения подобных задач, в протоколе **HTTP** присутствует механизм под названием сессии (**Session**).
+
+Главное отличие режима сессий от классических запросов заключается в том, что при использовании сессии клиент и сервер сохраняют прежнюю конфигурацию запросов, и продолжают обмен данными в рамках одного контекста. Реализован данный механизм может при помощи использования ряда методов, например, использования установленного единожды **TCP** соединения для выполнения двух и более запросов к удаленному серверу, или хранения данных от сессии в формате **cookie** заголовка, который мы рассмотрели ранее.
+
+Библиотека **requests** также предоставляет интерфейс для использования данного механизма, поэтому ниже мы рассмотрим пример практического применения данной концепции на двух примерах
+
+**Использование Session для смены User-Agent**
+```python
+import requests
+from requests.exceptions import RequestException
+
+try:
+    with requests.Session() as session:
+        print(session.get('https://ifconfig.me/ua').text)
+
+        session.headers.update({"User-Agent": "custom-useragent/1.0"})
+ 
+        print(session.get('https://ifconfig.me/ua').text)
+
+except requests.exceptions.RequestError as e: print(e)
+```
+
+**Использование Session для отправки запросов разных методов в рамках одной сессии**
+```python
+import requests
+from requests.exceptions import RequestException
+
+try:
+    data = {"data": "data"}
+    with requests.Session() as session:
+        print(session.get('https://httpbin.org/get').url)
+        print(session.post('https://httpbin.org/post', data=data).url)
+        print(session.put('https://httpbin.org/put', data=data).url)
+        print(session.delete('https://httpbin.org/delete').url)
+
+except requests.exceptions.RequestError as e: print(e)
 ```
